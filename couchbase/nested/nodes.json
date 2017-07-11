@@ -168,12 +168,12 @@
           "imageReference": {
             "publisher": "Canonical",
             "offer": "UbuntuServer",
-            "sku": "14.04.5-LTS",
+            "sku": "16.04.2-LTS",
             "version": "latest"
           },
           "dataDisks": [
             {
-              "diskSizeGB": "128",
+              "diskSizeGB": "256",
               "lun": 0,
               "createOption": "Empty"
             }
