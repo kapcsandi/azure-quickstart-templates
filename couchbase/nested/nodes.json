@@ -5,6 +5,9 @@
     "nodeCount": {
       "type": "int"
     },
+    "nodeStartIndex": {
+      "type": "int"
+    },
     "vmSize": {
       "type": "string"
     },
@@ -91,7 +94,7 @@
         "provider": "couchbase"
       },
       "type": "Microsoft.Network/publicIPAddresses",
-      "name": "[concat('pip', copyindex())]",
+      "name": "[concat('pip', copyindex(parameters('nodeStartIndex')))]",
       "location": "[resourceGroup().location]",
       "copy": {
         "name": "publicIPLoop",
@@ -100,7 +103,7 @@
       "properties": {
         "publicIPAllocationMethod": "Dynamic",
         "dnsSettings": {
-          "domainNameLabel": "[concat('vm', copyindex(), '-', parameters('uniqueString'))]"
+          "domainNameLabel": "[concat('vm', copyindex(parameters('nodeStartIndex')), '-', parameters('uniqueString'))]"
         }
       }
     },
@@ -110,14 +113,14 @@
         "provider": "couchbase"
       },
       "type": "Microsoft.Network/networkInterfaces",
-      "name": "[concat('nic', copyindex())]",
+      "name": "[concat('nic', copyindex(parameters('nodeStartIndex')))]",
       "location": "[resourceGroup().location]",
       "copy": {
         "name": "nicLoop",
         "count": "[parameters('nodeCount')]"
       },
       "dependsOn": [
-        "[concat('Microsoft.Network/publicIPAddresses/pip', copyindex())]",
+        "[concat('Microsoft.Network/publicIPAddresses/pip', copyindex(parameters('nodeStartIndex')))]",
         "Microsoft.Network/virtualNetworks/vnet"
       ],
       "properties": {
@@ -127,7 +130,7 @@
             "properties": {
               "privateIPAllocationMethod": "Dynamic",
               "publicIPAddress": {
-                "id": "[resourceId('Microsoft.Network/publicIPAddresses', concat('pip', copyindex()))]"
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', concat('pip', copyindex(parameters('nodeStartIndex'))))]"
               },
               "subnet": {
                 "id": "[concat(resourceId('Microsoft.Network/virtualNetworks','vnet'),'/subnets/subnet')]"
@@ -143,14 +146,14 @@
         "provider": "couchbase"
       },
       "type": "Microsoft.Compute/virtualMachines",
-      "name": "[concat('vm', copyindex())]",
+      "name": "[concat('vm', copyindex(parameters('nodeStartIndex')))]",
       "location": "[resourceGroup().location]",
       "copy": {
         "name": "vmLoop",
         "count": "[parameters('nodeCount')]"
       },
       "dependsOn": [
-        "[concat('Microsoft.Network/networkInterfaces/', 'nic', copyindex())]"
+        "[concat('Microsoft.Network/networkInterfaces/', 'nic', copyindex(parameters('nodeStartIndex')))]"
       ],
       "properties": {
         "availabilitySet": {
@@ -160,7 +163,7 @@
           "vmSize": "[parameters('vmSize')]"
         },
         "osProfile": {
-          "computerName": "[concat('vm', copyindex())]",
+          "computerName": "[concat('vm', copyindex(parameters('nodeStartIndex')))]",
           "adminUsername": "[parameters('adminUsername')]",
           "adminPassword": "[parameters('adminPassword')]"
         },
@@ -182,7 +185,7 @@
         "networkProfile": {
           "networkInterfaces": [
             {
-              "id": "[resourceId('Microsoft.Network/networkInterfaces', concat('nic', copyindex()))]"
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', concat('nic', copyindex(parameters('nodeStartIndex'))))]"
             }
           ]
         }
@@ -194,14 +197,14 @@
         "provider": "couchbase"
       },
       "type": "Microsoft.Compute/virtualMachines/extensions",
-      "name": "[concat('vm', copyindex(), '/install')]",
+      "name": "[concat('vm', copyindex(parameters('nodeStartIndex')), '/install')]",
       "location": "[resourceGroup().location]",
       "copy": {
         "name": "vmLoop",
         "count": "[parameters('nodeCount')]"
       },
       "dependsOn": [
-        "[concat('Microsoft.Compute/virtualMachines/vm', copyindex())]"
+        "[concat('Microsoft.Compute/virtualMachines/vm', copyindex(parameters('nodeStartIndex')))]"
       ],
       "properties": {
         "publisher": "Microsoft.Azure.Extensions",
@@ -217,7 +220,7 @@
           ]
         },
         "protectedSettings": {
-          "commandToExecute": "[concat('bash node.sh ', parameters('adminUsername'), ' ', parameters('adminPassword'), ' ', copyindex())]"
+          "commandToExecute": "[concat('bash node.sh ', parameters('adminUsername'), ' ', parameters('adminPassword'), ' ', copyindex(parameters('nodeStartIndex')))]"
         }
       }
     }

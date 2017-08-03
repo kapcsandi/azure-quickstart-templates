@@ -16,10 +16,16 @@
       },
       "defaultValue": ""
     },
+    "nodeStartIndex": {
+      "type": "int",
+      "metadata": {
+        "description": "Number of nodes in the cluster currently"
+      }
+    },
     "nodeCount": {
       "type": "int",
       "metadata": {
-        "description": "Number of nodes in the cluster"
+        "description": "Number of new nodes in the cluster after deploy"
       }
     },
     "vmSize": {
@@ -60,6 +66,9 @@
         "parameters": {
           "nodeCount": {
             "value": "[parameters('nodeCount')]"
+          },
+          "nodeStartIndex": {
+            "value": "[parameters('nodeStartIndex')]"
           },
           "vmSize": {
             "value": "[parameters('vmSize')]"
